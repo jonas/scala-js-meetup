@@ -1,0 +1,130 @@
+@(title: String, questions: Seq[Question])
+
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+
+	<title>@title</title>
+
+	<meta name="description" content="@title">
+	<meta name="author" content="Jonas Fonseca">
+
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/reveal.min.css")">
+	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/theme/default.css")" id="theme">
+
+	<!-- For syntax highlighting -->
+	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/lib/css/zenburn.css")">
+
+	<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+	<script>
+		if (window.location.search.match(/print-pdf/gi))
+			document.write('<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/print/pdf.css")" type="text/css" media="print">');
+		else
+			document.write('<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/print/paper.css")" type="text/css" media="print">');
+	</script>
+
+	<!--[if lt IE 9]>
+	<script src="@routes.Assets.at("reveal.js/lib/js/html5shiv.js")"></script>
+	<![endif]-->
+
+	<style>
+		.reveal h2 { text-transform: none; }
+		.reveal pre { width: auto; }
+		.reveal pre code {
+			overflow: initial;
+		}
+		.reveal h2 code {
+			font-size: 0.8em;
+		}
+		.reveal .slides .explaination-slide .explaination {
+			text-align: left;
+		}
+		.reveal .slides .explaination-slide .false-suggestion {
+			opacity: 0.2;
+		}
+	</style>
+</head>
+<body class="reveal">
+<div class="slides">
+
+<section>
+	<h1>@title</h1>
+</section>
+
+@for(question <- questions) {
+	<section>
+		<section>
+			@Html(question.text)
+			<ol>
+				@for(suggestion <- question.suggestions) {
+					<li>
+						@Html(suggestion.text)
+					</li>
+				}
+			</ol>
+
+		</section>
+		@if(question.suggestions.size > 0) {
+			<section class="explaination-slide">
+				@Html(question.text)
+				@question.explaination.map { explaination =>
+					<div class="explaination">
+						@Html(explaination)
+					</div>
+				}.getOrElse {
+					<ol>
+						@for(suggestion <- question.suggestions) {
+							<li class="@suggestion.answer-suggestion">
+								@Html(suggestion.text)
+							</li>
+						}
+					</ol>
+				}
+			</section>
+		}
+	</section>
+}
+
+</div>
+
+<script src="@routes.Assets.at("reveal.js/lib/js/head.min.js")"></script>
+<script src="@routes.Assets.at("reveal.js/js/reveal.min.js")"></script>
+
+<script>
+
+	// Full list of configuration options available here:
+	// https://github.com/hakimel/reveal.js#configuration
+	Reveal.initialize({
+		controls: true,
+		slideNumber: true,
+		progress: true,
+		history: true,
+		center: true,
+
+		theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+		transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+
+		// Parallax scrolling
+		// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+		// parallaxBackgroundSize: '2100px 900px',
+
+		// Optional libraries used to extend on reveal.js
+		dependencies: [
+			{ src: '@routes.Assets.at("reveal.js/lib/js/classList.js")', condition: function() { return !document.body.classList; } },
+			{ src: '@routes.Assets.at("reveal.js/plugin/markdown/marked.js")', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+			{ src: '@routes.Assets.at("reveal.js/plugin/markdown/markdown.js")', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+			{ src: '@routes.Assets.at("reveal.js/plugin/highlight/highlight.js")', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+			{ src: '@routes.Assets.at("reveal.js/plugin/zoom-js/zoom.js")', async: true, condition: function() { return !!document.body.classList; } },
+			{ src: '@routes.Assets.at("reveal.js/plugin/notes/notes.js")', async: true, condition: function() { return !!document.body.classList; } }
+		]
+	});
+
+</script>
+</body>
+</html>

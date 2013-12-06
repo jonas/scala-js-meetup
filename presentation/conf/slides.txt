@@ -1,0 +1,130 @@
+# Scala.js - Compiling Scala to JavaScript
+
+## Agenda
+
+- Overview of Scala.js
+- Examples
+- Questions
+
+## Example
+
+JavaScript:
+```javascript
+var emailProviders = [ '@gmail.com', '@hotmail.com', '...' ];
+var button = document.getElementById("button");
+button.onclick = function() {
+  var email = document.getElementById("email").value;
+  function isHostingEmail(p) { return email.lastIndexOf(p) >= 0; }
+  if (emailProviders.some(isHostingEmail)
+    console.log("Send data to server");
+  else
+    alert('Email provider for ' + email + ' is not supported');
+}
+```
+
+<div class="fragment">
+Scala:
+```scala
+val emailProviders = List("@gmail.com", "@hotmail.com", "...")
+val g = js.Dynamic.global
+val button = g.document.getElementById("button")
+button.onclick = { () =>
+  val email = g.document.getElementById("email").value.asInstanceOf[String]
+  if (emailProviders.exists(email.endsWith(_)))
+    g.console.log("Send data to server")
+  else
+    g.alert(s"Email provider for ${email} is not supported")
+}
+```
+
+## Project Overview
+
+- Started February 2013 by Sébastien Doeraene
+- Done in the context of LAMP/EPFL
+- First public presentation at Scala Days 2013
+- Latest release is v0.2.1 (2014-01-14); v0.1 from 2013-11-29
+
+## Project Focus
+
+- Support as much of Scala as possible, e.g. macros
+- Provide amazing interoperability with JavaScript
+
+## Project Status
+
+- Support as much of Scala as possible, e.g. macros
+-
+
+Short-term goals:
+- scala-js-pickling
+- scala-js-actors
+
+## Interoperability
+
+js.*
+primitive types
+implicit conversion
+js.Dynamic
+traits
+TypeScript compiler
+
+## Differences to Scala
+
+- Semantic differences
+
+## Performance
+
+> About 10 times slower than handwritten JavaScript for ideomatic Scala code
+
+- scala-js-benchmarks: port of Dart benchmark harness
+
+??? scala-js-benchmark data ???
+```
+d8                        : 3.19.18.4 [/usr/local/bin/d8]
+node                      : v0.10.21 [/usr/local/bin/node]
+
+deltablue [dev] sbt       :         7.24 real        12.84 user         0.75 sys
+deltablue [opt] sbt       :         7.31 real        13.12 user         0.74 sys
+deltablue [dev] d8        : 9747.57281553398 us
+deltablue [opt] d8        : 3566.8449197860964 us
+deltablue [js] d8         : 298.9983555090447 us
+
+richards [dev] sbt        :         7.77 real        13.07 user         0.76 sys
+richards [opt] sbt        :         7.29 real        12.94 user         0.75 sys
+richards [dev] d8         : 5173.12661498708 us
+richards [opt] d8         : 2288.329519450801 us
+richards [js] d8          : 180.42399639152006 us
+
+tracer [dev] sbt          :         7.85 real        13.23 user         0.79 sys
+tracer [opt] sbt          :         7.34 real        13.16 user         0.76 sys
+tracer [dev] d8           : 16578.512396694216 us
+tracer [opt] d8           : 8871.681415929204 us
+tracer [js] d8            : 3496.5034965034965 us
+```
+
+## Examples
+
+- ???
+
+## Interesting Projects
+
+- Scala.js Workbench
+
+
+## Contribute
+
+- GitHub: [http://github.com/scala-js/scala-js](http://github.com/scala-js/scala-js)
+- Discussion: [https://groups.google.com/forum/#forum/scala-js](https://groups.google.com/forum/#forum/scala-js)
+
+## Ideas for contribution
+
+- Expand the port the Java library written in Scala.js
+- Testing infrastructure
+- Libraries: lightweight collection library, UI library, networking, etc.
+- Integration with Play (maybe also Lift?)
+- Threading and Co.: what can we do about threads, futures, and Akka?
+- See also [http://www.scala-js.org/contribute](http://www.scala-js.org/contribute)
+
+## Questions?
+
+- [http://scala-js.org](http://scala-js.org)
+- [mailto:jonas.fonseca@gmail.com](jonas.fonseca@gmail.com)

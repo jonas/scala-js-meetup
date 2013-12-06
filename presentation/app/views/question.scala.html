@@ -1,0 +1,29 @@
+@(title: String, questions: Seq[Question], qid: Int)
+
+@main(title) {
+
+	Question @{qid + 1} of @questions.length
+
+	@Html(questions(qid).text)
+
+	<form role="form" action="@routes.Application.question(qid)" method="get">
+		<div class="form-group">
+			@for(suggestion <- questions(qid).suggestions) {
+				<div class="@if(questions(qid).checkbox) {checkbox} else {radio}">
+					<label>
+						@if(questions(qid).checkbox) {
+							<input type="checkbox" name="answer" value="@suggestion.id" />
+						} else {
+							<input type="radio" name="answer" value="@suggestion.id" />
+						}
+						@Html(suggestion.text)
+					</label>
+				</div>
+			}
+
+		</div>
+		<button type="submit" class="btn btn-default pull-right">Next &rarr;</button>
+		<a href="@routes.Application.question(qid - 1)" class="btn btn-default @if(qid - 1 < 0) {disabled}">&larr;  Previous</a>
+	</form>
+	
+}

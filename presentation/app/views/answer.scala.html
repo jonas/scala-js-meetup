@@ -1,0 +1,30 @@
+@(title: String, questions: Seq[Question], qid: Int, answers: Seq[Int], correct: Boolean)
+
+@main(title) {
+
+	Question @{qid + 1} of @questions.length
+
+	@Html(questions(qid).text)
+
+	@if(correct) {
+		<div class="alert alert-success">Correct</div>
+	} else {
+		<div class="alert alert-danger">Not quite</div>
+	}
+
+	@questions(qid).explaination.map { explaination =>
+		@Html(explaination)
+	}.getOrElse {
+		<ol>
+			@for(suggestion <- questions(qid).suggestions) {
+				<li class="@suggestion.answer-suggestion">
+					@Html(suggestion.text)
+				</li>
+			}
+		</ol>
+	}
+
+	<a href="@routes.Application.question(qid + 1)" class="btn btn-default pull-right @if(qid + 1 >= questions.length) {disabled}">Next &rarr;</a>
+	<a href="@routes.Application.question(qid - 1)" class="btn btn-default @if(qid - 1 < 0) {disabled}">&larr; Previous</a>
+
+}

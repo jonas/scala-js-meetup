@@ -1,0 +1,11 @@
+@(title: String, questions: Seq[Question])
+
+@main(title) {
+
+	<p>There are @questions.length questions. Ready to start?</p>
+
+	<div class="btn-toolbar" role="toolbar">
+    	<a href="@routes.Application.presentation" class="btn btn-default">Show the Presentation</a>
+    	<a href="@routes.Application.question(0)" class="btn btn-default">Start Quiz</a>
+    </div>
+}
