@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email - Scala.js Examples</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+
+<form>
+  <h1>Please enter an email address</h1>
+  <input id="email" placeholder="e.g. john.doe@gmail.com" style="width:200px" />
+  <a href="#" id="button">Check if email provider is supported</a>
+</form>
+
+<script>
+	var srcs = window.location.search.match(/scala-js=opt/gi)
+		? ['-opt'] : ['-extdeps', '-intdeps', ''];
+	function loadScript(index) {
+		var script = document.createElement('script');
+		script.src = './target/scala-2.10/email' + srcs[index] + '.js';
+		if (index + 1 < srcs.length) {
+			script.onload = function() { loadScript(index + 1); };
+		}
+		document.head.appendChild(script);
+	}
+	loadScript(0);
+</script>
+
+</body>
+</html>
