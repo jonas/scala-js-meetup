@@ -1,10 +1,28 @@
-# Scala.js - Compiling Scala to JavaScript
+# Scala.js
+<!-- Compiling Scala to JavaScript -->
 
-## Agenda
+<img src="/assets/images/scala-js-logo.svg" style="width: 40%" />
 
-- Overview of Scala.js
-- Examples
-- Questions
+## Project Overview
+
+- Scala compiler plugin that emits JavaScript
+- Started February 2013 by Sébastien Doeraene
+- Done in the context of LAMP/EPFL
+- First presented at Scala Days 2013
+- v0.2.1 released 2014-01-14 (v0.1 from 2013-11-29)
+
+## Features
+
+- All of the Scala language, e.g. macros<sup>*</sup>
+    - ... and most of the standard library
+- Great interoperability with JavaScript
+- SBT plugin with support for dependency management
+- Source maps to help debug in the browser
+- Test framework based on Jasmine
+
+<br/>
+<br/>
+<p style="font-size: 50%">* some limitations apply.</p>
 
 ## Example
 
@@ -37,94 +55,360 @@ button.onclick = { () =>
 }
 ```
 
-## Project Overview
-
-- Started February 2013 by Sébastien Doeraene
-- Done in the context of LAMP/EPFL
-- First public presentation at Scala Days 2013
-- Latest release is v0.2.1 (2014-01-14); v0.1 from 2013-11-29
-
-## Project Focus
-
-- Support as much of Scala as possible, e.g. macros
-- Provide amazing interoperability with JavaScript
-
-## Project Status
-
-- Support as much of Scala as possible, e.g. macros
--
-
-Short-term goals:
-- scala-js-pickling
-- scala-js-actors
-
 ## Interoperability
 
-js.*
-primitive types
-implicit conversion
-js.Dynamic
-traits
-TypeScript compiler
+- JavaScript API
+- Implicit conversions
+
+## JavaScript API
+
+<div style="width:50%; float:left; text-align:left;">
+<h3>Primitive types</h3>
+
+<code>js.Boolean</code><br/>
+<code>js.String</code><br/>
+<code>js.Number</code><br/>
+<code>js.Undefined</code><br/>
+
+</div>
+<div style="width:50%; float:left; text-align:left;">
+<h3>Non-primitive types</h3>
+
+<code>js.Any</code> <i style="float:right">super type</i><br/>
+<code>js.Object</code><br/>
+<hr/>
+<code>js.Dictionary</code> <i style="float:right">map-like API</i><br/>
+<code>js.Array</code><br/>
+<code>js.Function</code><i>N</i><br/>
+<code>js.Date</code><br/>
+<code>js.RegExp</code><br/>
+
+</div>
+
+## Implicit conversions
+
+`java.lang.String` ⇆ `js.String`	<br/>
+`scala.Boolean` ⇆ `js.Boolean`	<br/>
+`scala.{Char, Byte, Short, Int, Long, Float, Double}` ⇆ `js.Number`	<br/>
+
+***
+
+`scala.Function`_N_ ⇆ `js.Function`_N_	<br/>
+`scala.Array` ⇆ `js.Array`	<br/>
+`scala.Unit` ⇆ `js.Undefined`	<br/>
+
+## JavaScript API Examples
+
+```scala
+import scala.scalajs.js
+import js.Dynamic.{global => g}
+
+val now = js.Date()
+val regex = js.Regex("Dictionary.literal(...)
+
+def
+???
+```
+
+## Dynamically typed with js.Dynamic
+
+- Uses scala.Dynamic added in Scala 2.10
+- Allows to read/write any field or method
+- `js.Dynamic.global` gives access to global scope
+- `js.Dynamic.newInstance()` instantiates a new object
+- `js.Dynamic.literal()` creates object with literal syntax
+
+## js.Dynamic Example
+
+```scala
+import scala.scalajs.js
+import js.Dynamic.{global => g}
+
+val document = g.document
+val p = document.createElement("p")
+p.innerHTML = js.Dynamic.newInstance(g.Date)()
+
+val styles: js.Dictionary = js.Dynamic.literal(
+  color = "green",
+  fontWeight = "bold"
+)
+
+for (cssProperty <- js.Dictionary.propertiesOf(styles)) {
+  val pStyles = p.style.asInstanceOf[js.Dictionary]
+  pStyles(cssProperty) = styles(cssProperty)
+}
+
+document.body.appendChild(p)
+```
+
+## Creating Wrappers for JavaScript APIs
+
+- js.GlobalScope
+- traits
+- @JSName
+
+## Exporting APIs to JavaScript
+
+???
+
+## TypeScript compiler
+
+## Statically Typed DOM API for Scala.js
+
+- Available via scala-js-dom project
+- http://github.com/scala-js/scala-js-dom
+- Focuses on cross-browser standards-based APIs
+- Originally generated from TypeScript code
+- Tweaked and improved with MDN docs
+
+## DOM Example
+
+Dynamically typed:
+```scala
+val emailProviders = List("@gmail.com", "@hotmail.com", "...")
+val g = js.Dynamic.global
+val button = g.document.getElementById("button")
+button.onclick = { () =>
+  val email = g.document.getElementById("email").value.asInstanceOf[String]
+  if (emailProviders.exists(email.endsWith(_)))
+    g.console.log("Send data to server")
+  else
+    g.alert(s"Email provider for ${email} is not supported")
+}
+```
+
+<div class="fragment">
+Statically typed:
+```scala
+val emailProviders = List("@gmail.com", "@hotmail.com", "...")
+val button = document.getElementById("button")
+val emailInput = document.getElementById("email").asInstanceOf[HTMLInputElement]
+button.onclick = checkEmail _
+def checkEmail(e: MouseEvent): js.Any = {
+  val email: String = emailInput.value
+  if (emailProviders.exists(email.endsWith(_)))
+    console.log("Send data to server")
+  else
+    alert(s"Email provider for ${email} is not supported")
+}
+```
+
+## Statically Typed API for jQuery
+
+- Available via scala-js-jquery project
+- http://github.com/scala-js/scala-js-jquery
+- E.g. more than 350 methods in the main jQuery trait
+
+## jQuery Example
+
+DOM:
+```scala
+val emailProviders = List("@gmail.com", "@hotmail.com", "...")
+val button = document.getElementById("button")
+val emailInput = document.getElementById("email").asInstanceOf[HTMLInputElement]
+button.onclick = checkEmail _
+def checkEmail(e: MouseEvent): js.Any = {
+  val email: String = emailInput.value
+  if (emailProviders.exists(email.endsWith(_)))
+    console.log("Send data to server")
+  else
+    alert(s"Email provider for ${email} is not supported")
+  true
+}
+```
+
+<div class="fragment">
+DOM + jQuery:
+```scala
+val emailProviders = List("@gmail.com", "@hotmail.com", "...")
+jQuery("#button").click { e: JQueryEventObject =>
+  val email = jQuery("#email").`val`().asInstanceOf[String]
+  if (emailProviders.exists(email.endsWith(_)))
+    console.log("Send data to server")
+  else
+    alert(s"Email provider for ${email} is not supported")
+}
+```
 
 ## Differences to Scala
 
-- Semantic differences
+- `Char` and primitive numerical types (except for `Long`) implemented via `js.Number`
+    - No overflow checking or wrapping
+    - Certain operators behave differently (e.g. «`&`», «`|`» etc.)
+    - `Long`s emulated and behaves as on the JVM
+
+## Differences to Scala (cont.)
+
+- Exception checking and handling
+    - `NullPointerException` reported as JS `TypeError`
+    - `ArrayOutOfBoundsException` not reported for arrays
+- Limited support for reflection
+    - Enough to provide: `obj.getClass.getName` and `isInstanceOf[T]`
+- Regular expressions: uses JavaScript `RegExp` syntax
+- See also: [http://www.scala-js.org/doc/semantics.html](http://www.scala-js.org/doc/semantics.html)
+
+## How do I get started?
+
+## SBT Plugin
+
+`project/plugin.sbt`
+```
+addSbtPlugin("org.scala-lang.modules.scalajs" % "scalajs-sbt-plugin" % "0.2.1")
+```
+
+`build.sbt`
+```scala
+// Turn this project into a Scala.js project by importing these settings
+scalaJSSettings
+
+name := "Example"
+
+version := "0.1-SNAPSHOT"
+
+libraryDependencies ++= Seq(
+    "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" 
+                                                % scalaJSVersion % "test"
+)
+
+// Specify additional .js file to be passed to package-js and optimize-js
+unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+    baseDirectory.value / "js" / "startup.js"
+```
+
+## SBT Tasks
+
+- packageJS: unpacks deps and compiles Scala to JavaScript
+- optimizeJS: minimizes JavaScript using Closure Compiler
+- run: execute JavaScript code
+- test: runs JavaScript tests using Jasmine test framework
+- Uses Rhino to run JavaScript code
+
+## Testing
+
+- Test runner integrated with SBT
+    - Hooked into SBT's `test` lifecycle
+    - Auto-discovers test classes
+- Uses Jasmine-based test framework
+- Used by Scala.js itself
+
+## Testing Example
+
+```scala
+import scala.scalajs.js
+import js.Dynamic.{ global => g }
+import scala.scalajs.test.JasmineTest
+
+object ScalaJSExampleTest extends JasmineTest {
+
+  describe("ScalaJSExample") {
+
+    it("should implement square()") {
+      import ScalaJSExample._
+
+      expect(square(0)).toBe(0)
+      expect(square(4)).toBe(16)
+      expect(square(-5)).toBe(25)
+    }
+  }
+}
+```
+
+## So what the catch?
+
+<div class="fragment">
+```
+-rw-r--r--  1 fonseca  wheel    17M 20 Jan 23:32 jquery-email-extdeps.js
+-rw-r--r--  1 fonseca  wheel     0B 20 Jan 23:31 jquery-email-intdeps.js
+-rw-r--r--  1 fonseca  wheel   8.4K 20 Jan 23:32 jquery-email.js
+```
+
+<div class="fragment">
+
+<h2>Why?
+<!--
+<code style="font-family: Helvetica"> (yಠ,ಠ)y</code>
+-->
+</h2>
+
+<div class="fragment">
+
+- Whole Scala library compiles to JS (~17M)
+- The way Scala classes are encoded in JavaScript
+- No linker stage to keep compilation fast
+- No dead code elimination done by the compiler
 
 ## Performance
 
-> About 10 times slower than handwritten JavaScript for ideomatic Scala code
-
-- scala-js-benchmarks: port of Dart benchmark harness
-
-??? scala-js-benchmark data ???
 ```
 d8                        : 3.19.18.4 [/usr/local/bin/d8]
-node                      : v0.10.21 [/usr/local/bin/node]
 
-deltablue [dev] sbt       :         7.24 real        12.84 user         0.75 sys
-deltablue [opt] sbt       :         7.31 real        13.12 user         0.74 sys
 deltablue [dev] d8        : 9747.57281553398 us
 deltablue [opt] d8        : 3566.8449197860964 us
 deltablue [js] d8         : 298.9983555090447 us
 
-richards [dev] sbt        :         7.77 real        13.07 user         0.76 sys
-richards [opt] sbt        :         7.29 real        12.94 user         0.75 sys
 richards [dev] d8         : 5173.12661498708 us
 richards [opt] d8         : 2288.329519450801 us
 richards [js] d8          : 180.42399639152006 us
 
-tracer [dev] sbt          :         7.85 real        13.23 user         0.79 sys
-tracer [opt] sbt          :         7.34 real        13.16 user         0.76 sys
 tracer [dev] d8           : 16578.512396694216 us
 tracer [opt] d8           : 8871.681415929204 us
 tracer [js] d8            : 3496.5034965034965 us
 ```
 
-## Examples
+> ~10 times slower than handwritten JavaScript for "ideomatic Scala code"
 
-- ???
+## Performance Tips
 
-## Interesting Projects
+<ul>
+<li class="fragment">
+  Limit collection library to when it's really needed
 
-- Scala.js Workbench
+<li class="fragment">
+  Prefer <code>while</code>-loops to <code>for</code>-comprehension in hot paths
 
+<li class="fragment">
+  Use native JS API when possible, e.g. <code>js.Array.forEach</code>
 
-## Contribute
+</ul>
 
+## What's next?
+
+- Scala.js Actors
+    - Actor system using web workers
+    - Transparent collaboration with Akka-based backend
+    - [https://github.com/sjrd/scala-js-actors](https://github.com/sjrd/scala-js-actors)
+
+- Scala.js Pickling
+    - Serialization for Scala.js objects inspired by Scala Pickling
+    - Used for communication between web workers and browser process
+    - [https://github.com/sjrd/scala-js-pickling](https://github.com/sjrd/scala-js-pickling)
+
+- Support for Scala 2.11
+    - Lambdas are translated to anonymous JavaScript functions
+    - <abbr title="Single Abstract Method">SAM</abbr> support: parameter types are automatically infered for `js.FunctionN`
+    - Run the Scala `partest`
+
+## On the Roadmap
+
+- Expand the port of the Java library written in Scala.js
+- Testing infrastructure improvements
+- Integration with Play (maybe also Lift?)
+- Support for threads, futures, and Akka?
+- Lots of libraries: lightweight collections, UI, networking, ...
+
+> [http://www.scala-js.org/contribute](http://www.scala-js.org/contribute)
+
+## More Information
+
+- Homepage: [http://scala-js.org](http://scala-js.org)
 - GitHub: [http://github.com/scala-js/scala-js](http://github.com/scala-js/scala-js)
 - Discussion: [https://groups.google.com/forum/#forum/scala-js](https://groups.google.com/forum/#forum/scala-js)
-
-## Ideas for contribution
-
-- Expand the port the Java library written in Scala.js
-- Testing infrastructure
-- Libraries: lightweight collection library, UI library, networking, etc.
-- Integration with Play (maybe also Lift?)
-- Threading and Co.: what can we do about threads, futures, and Akka?
-- See also [http://www.scala-js.org/contribute](http://www.scala-js.org/contribute)
+- Paper: [Scala.js: Type-Directed Interoperability with Dynamically Typed Languages](http://infoscience.epfl.ch/record/190834/files/scalajs-paper.pdf)
 
 ## Questions?
 
-- [http://scala-js.org](http://scala-js.org)
-- [mailto:jonas.fonseca@gmail.com](jonas.fonseca@gmail.com)
+<div class="fragment">
+<h2>Thanks</h2>
+
+- [jonas.fonseca@gmail.com](mailto:jonas.fonseca@gmail.com)
+- [https://github.com/jonas](https://github.com/jonas)
