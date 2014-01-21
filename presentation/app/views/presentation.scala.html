@@ -18,9 +18,6 @@
 	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/reveal.min.css")">
 	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/theme/default.css")" id="theme">
 
-	<!-- For syntax highlighting -->
-	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/lib/css/zenburn.css")">
-
 	<!-- If the query includes 'print-pdf', use the PDF print sheet -->
 	<script>
 		if (window.location.search.match(/print-pdf/gi))
@@ -107,7 +104,8 @@
 		history: true,
 		center: true,
 
-		theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+		theme: Reveal.getQueryHash().theme || 'default', // available themes are in /css/theme
+		syntax: Reveal.getQueryHash().syntax || 'solarized_dark', // available themes are in /lib/css: zenburn/idea/solarized_dark
 		transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
 
 		// Parallax scrolling
@@ -122,9 +120,24 @@
 			{ src: '@routes.Assets.at("reveal.js/plugin/highlight/highlight.js")', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
 			{ src: '@routes.Assets.at("reveal.js/plugin/zoom-js/zoom.js")', async: true, condition: function() { return !!document.body.classList; } },
 			{ src: '@routes.Assets.at("reveal.js/plugin/notes/notes.js")', async: true, condition: function() { return !!document.body.classList; } }
-		]
+		],
+
+		syntaxThemes: {
+			'zenburn': '@routes.Assets.at("reveal.js/lib/css/zenburn.css")',
+			'idea': '@routes.Assets.at("reveal.js/lib/css/idea.css")',
+			'solarized_dark': '@routes.Assets.at("reveal.js/lib/css/solarized_dark.css")'
+		}
 	});
 
 </script>
+
+<script>
+	(function() {
+		var cfg = Reveal.getConfig();
+		var syntax = cfg.syntaxThemes[cfg.syntax] || cfg.syntaxThemes['zenburn'];
+		document.write('<link rel="stylesheet" href="' + syntax + '" type="text/css">');
+	})();
+</script>
+
 </body>
 </html>
