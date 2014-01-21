@@ -24,5 +24,14 @@ lazy val `dom-email` = project.in(file("dom-email"))
             baseDirectory.value / "js" / "startup.js"
     )
 
+lazy val `jquery-email` = project.in(file("jquery-email"))
+    .settings(scalaJSSettings: _*)
+    .settings(
+        libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-dom" % "0.1-SNAPSHOT",
+        libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-jquery" % "0.1-SNAPSHOT",
+        unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+            baseDirectory.value / "js" / "startup.js"
+    )
+
 lazy val testing = project.in(file("testing"))
     .settings(scalaJSSettings: _*)
