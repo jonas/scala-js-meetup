@@ -17,7 +17,6 @@ object ScalaJSExample {
         console.log("Send data to server")
       else
         alert(s"Email provider for ${email} is not supported")
-      true
     }
   }
 
