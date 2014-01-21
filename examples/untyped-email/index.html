@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Email - Scala.js Examples</title>
+  <title>Untyped Email - Scala.js Examples</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
@@ -17,7 +17,7 @@
 		? ['-opt'] : ['-extdeps', '-intdeps', ''];
 	function loadScript(index) {
 		var script = document.createElement('script');
-		script.src = './target/scala-2.10/email' + srcs[index] + '.js';
+		script.src = './target/scala-2.10/untyped-email' + srcs[index] + '.js';
 		if (index + 1 < srcs.length) {
 			script.onload = function() { loadScript(index + 1); };
 		}
