@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JS API - Scala.js Examples</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+  <h1>Simple jQuery Wrapper Example</h1>
+  <a id="link" href="#">Clicked 0 times</a>
+</body>
+
+<script src="./js/jquery.js"></script>
+<script>
+	var srcs = window.location.search.match(/scala-js=opt/gi)
+		? ['-opt'] : ['-extdeps', '-intdeps', ''];
+	function loadScript(index) {
+		var script = document.createElement('script');
+		script.src = './target/scala-2.10/jquery-wrapper' + srcs[index] + '.js';
+		if (index + 1 < srcs.length) {
+			script.onload = function() { loadScript(index + 1); };
+		}
+		document.head.appendChild(script);
+	}
+	loadScript(0);
+</script>
+
+</html>

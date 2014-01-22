@@ -4,8 +4,13 @@ version := "0.1-SNAPSHOT"
 
 lazy val root = project.in(file("."))
     .aggregate(
+        `js-api`,
+        `js-dynamic`,
+        `jquery-wrapper`,
+        `dom-wrapper`,
         `untyped-email`,
         `dom-email`,
+        `jquery-email`,
 	testing
     )
 
@@ -17,6 +22,20 @@ lazy val `js-api` = project.in(file("js-api"))
     )
 
 lazy val `js-dynamic` = project.in(file("js-dynamic"))
+    .settings(scalaJSSettings: _*)
+    .settings(
+        unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+            baseDirectory.value / "js" / "startup.js"
+    )
+
+lazy val `jquery-wrapper` = project.in(file("jquery-wrapper"))
+    .settings(scalaJSSettings: _*)
+    .settings(
+        unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+            baseDirectory.value / "js" / "startup.js"
+    )
+
+lazy val `dom-wrapper` = project.in(file("dom-wrapper"))
     .settings(scalaJSSettings: _*)
     .settings(
         unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
