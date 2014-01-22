@@ -87,27 +87,42 @@ button.onclick = { () =>
 
 ## Implicit conversions
 
-`java.lang.String` ⇆ `js.String`	<br/>
-`scala.Boolean` ⇆ `js.Boolean`	<br/>
-`scala.{Char, Byte, Short, Int, Long, Float, Double}` ⇆ `js.Number`	<br/>
+`java.lang.String` ⇔ `js.String`	<br/>
+`scala.Boolean` ⇔ `js.Boolean`	<br/>
+`scala.{Char, Byte, Short, Int, Long, Float, Double}` ⇒ `js.Number`	<br/>
 
 ***
 
-`scala.Function`_N_ ⇆ `js.Function`_N_	<br/>
-`scala.Array` ⇆ `js.Array`	<br/>
-`scala.Unit` ⇆ `js.Undefined`	<br/>
+`scala.Function`_N_ ⇔ `js.Function`_N_	<br/>
+`scala.Array` ⇔ `js.Array`	<br/>
+`scala.Unit` ⇔ `js.Undefined`	<br/>
 
 ## JavaScript API Examples
 
 ```scala
 import scala.scalajs.js
-import js.Dynamic.{global => g}
+val console = js.Dynamic.global.console
 
-val now = js.Date()
-val regex = js.Regex("Dictionary.literal(...)
+def isWednesday(date: js.Date) =
+  js.RegExp("Wed").exec(date.toString) ne null
 
-def
-???
+val date = new js.Date
+val todayIsWednesday = isWednesday(date)
+console.log(date, " is Wednesday? ", todayIsWednesday)
+
+val time = date.getTime
+date.setTime(time + 24 * 60 * 60 * 1000)
+console.log(date, " is Wednesday? ", isWednesday(date))
+
+val arr = js.Array[js.String]()
+arr.push("Scala.js")
+arr.push(s"Date: $date")
+console.log(arr)
+
+val msg = arr.length.toInt match {
+  case 2 => console.log("Has two items")
+  case _ => console.log("Has ${arr.length} items")
+}
 ```
 
 ## Dynamically typed with js.Dynamic
@@ -143,15 +158,41 @@ document.body.appendChild(p)
 
 ## Creating Wrappers for JavaScript APIs
 
-- js.GlobalScope
-- traits
-- @JSName
+- Multiple approaches are supported
+- Defined as traits that extends `js.Object`
+- Map to entry point using `object` that extends `js.GlobalScope` or `js.Object`
+- `@JSName`: name JS field/method: e.g. `val`
+- `@JSBracketAccess`: when JS array-subscription is required
 
-## Exporting APIs to JavaScript
+## DOM Wrapper Example
 
-???
+```scala
+trait DOMDocument extends js.Object {
+  def createElement(name: js.String): HTMLElement = ???
+  val body: HTMLElement
+}
 
-## TypeScript compiler
+trait HTMLElement extends js.Object {
+  def appendChild(child: HTMLElement): HTMLElement = ???
+  var innerHTML: js.String
+}
+```
+
+```scala
+package example
+
+import scala.scalajs.js
+
+package object dom extends js.GlobalScope {
+  val document: DOMDocument = ???
+}
+```
+
+```scala
+val p = dom.document.createElement("p")
+p.innerHTML = "Hello from the DOM API"
+dom.document.body.appendChild(p)
+```
 
 ## Statically Typed DOM API for Scala.js
 
@@ -193,6 +234,31 @@ def checkEmail(e: MouseEvent): js.Any = {
 }
 ```
 
+## jQuery Wrapper Example
+
+```scala
+object jQuery extends js.Object {
+  def apply(selector: js.Any): JQuery = ???
+}
+
+trait jQuery extends js.Object {
+  def html(): js.String
+  def html(value: js.String): this.type
+
+  def click[U](f: js.Function0[U]): this.type
+}
+```
+
+```scala
+var count = 0
+
+val link = jQuery("#link")
+link.click { () =>
+  count += 1
+  link.html(s"Clicked ${count} times")
+}
+```
+
 ## Statically Typed API for jQuery
 
 - Available via scala-js-jquery project
@@ -229,6 +295,13 @@ jQuery("#button").click { e: JQueryEventObject =>
     alert(s"Email provider for ${email} is not supported")
 }
 ```
+
+## Interacting with Scala.js from JavaScript
+
+- All Scala.js code exported via `ScalaJS` object
+- Method overloading is supported via parameter type checks
+- New instances of classes can be created using `new`
+- Objects can be accessed directly.
 
 ## Differences to Scala
 
