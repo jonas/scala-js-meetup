@@ -9,6 +9,20 @@ lazy val root = project.in(file("."))
 	testing
     )
 
+lazy val `js-api` = project.in(file("js-api"))
+    .settings(scalaJSSettings: _*)
+    .settings(
+        unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+            baseDirectory.value / "js" / "startup.js"
+    )
+
+lazy val `js-dynamic` = project.in(file("js-dynamic"))
+    .settings(scalaJSSettings: _*)
+    .settings(
+        unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+            baseDirectory.value / "js" / "startup.js"
+    )
+
 lazy val `untyped-email` = project.in(file("untyped-email"))
     .settings(scalaJSSettings: _*)
     .settings(
