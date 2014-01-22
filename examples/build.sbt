@@ -66,5 +66,12 @@ lazy val `jquery-email` = project.in(file("jquery-email"))
             baseDirectory.value / "js" / "startup.js"
     )
 
+lazy val `scala-api-email` = project.in(file("scala-api-email"))
+    .settings(scalaJSSettings: _*)
+    .settings(
+        unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+            baseDirectory.value / "js" / "startup.js"
+    )
+
 lazy val testing = project.in(file("testing"))
     .settings(scalaJSSettings: _*)
