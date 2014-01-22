@@ -302,6 +302,41 @@ jQuery("#button").click { e: JQueryEventObject =>
 - Method overloading is supported via parameter type checks
 - New instances of classes can be created using `new`
 - Objects can be accessed directly.
+- Use unmanaged JS source to support optimization
+
+```
+unmanagedSources in (Compile, ScalaJSKeys.packageJS) +=
+    baseDirectory.value / "js" / "startup.js"
+```
+
+## Example Interaction from JavaScript
+
+```scala
+class EmailChecker {
+  val emailProviders = List("@gmail.com", "@hotmail.com", "...")
+
+  def isValid(email: String): Boolean =
+    emailProviders.exists(email.endsWith(_))
+}
+```
+
+```scala
+object Messages {
+  def notSupported(email: String): String =
+    s"Email provider for ${email} is not supported"
+}
+```
+
+```javascript
+function checkEmail() {
+  var emailChecker = new ScalaJS.classes.example_EmailChecker();
+  var email = document.forms[0].email.value;
+  if (emailChecker.isValid(email))
+    console.log("Send to server");
+  else
+    alert(ScalaJS.modules.example_Messages().notSupported(email))
+}
+```
 
 ## Differences to Scala
 
@@ -413,19 +448,17 @@ object ScalaJSExampleTest extends JasmineTest {
 ## Performance
 
 ```
-d8                        : 3.19.18.4 [/usr/local/bin/d8]
+deltablue [dev] d8        :  9747.57281553398    us
+deltablue [opt] d8        :  3566.8449197860964  us
+deltablue [js] d8         :   298.9983555090447  us
 
-deltablue [dev] d8        : 9747.57281553398 us
-deltablue [opt] d8        : 3566.8449197860964 us
-deltablue [js] d8         : 298.9983555090447 us
+richards [dev] d8         :  5173.12661498708    us
+richards [opt] d8         :  2288.329519450801   us
+richards [js] d8          :   180.42399639152006 us
 
-richards [dev] d8         : 5173.12661498708 us
-richards [opt] d8         : 2288.329519450801 us
-richards [js] d8          : 180.42399639152006 us
-
-tracer [dev] d8           : 16578.512396694216 us
-tracer [opt] d8           : 8871.681415929204 us
-tracer [js] d8            : 3496.5034965034965 us
+tracer [dev] d8           : 16578.512396694216   us
+tracer [opt] d8           :  8871.681415929204   us
+tracer [js] d8            :  3496.5034965034965  us
 ```
 
 > ~10 times slower than handwritten JavaScript for "ideomatic Scala code"
@@ -458,7 +491,7 @@ tracer [js] d8            : 3496.5034965034965 us
 
 - Support for Scala 2.11
     - Lambdas are translated to anonymous JavaScript functions
-    - <abbr title="Single Abstract Method">SAM</abbr> support: parameter types are automatically infered for `js.FunctionN`
+    - <abbr title="Single Abstract Method">SAM</abbr> support: function param types infered automatically
     - Run the Scala `partest`
 
 ## On the Roadmap
@@ -480,8 +513,11 @@ tracer [js] d8            : 3496.5034965034965 us
 
 ## Questions?
 
+[https://github.com/jonas/scala-js-meetup](https://github.com/jonas/scala-js-meetup)
+
 <div class="fragment">
-<h2>Thanks</h2>
+<br/>
+<h2>Thanks!</h2>
 
 - [jonas.fonseca@gmail.com](mailto:jonas.fonseca@gmail.com)
 - [https://github.com/jonas](https://github.com/jonas)
