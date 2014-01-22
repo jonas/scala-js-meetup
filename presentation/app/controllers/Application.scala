@@ -16,26 +16,26 @@ object Application extends Controller {
   implicit val codec = scala.io.Codec.UTF8
 
   def index = Action {
-    Ok(views.html.index(quizTitle, questions))
+    Ok(views.html.index(title, titlePage, questions))
   }
 
   def question(qid: Int, answer: Seq[String]) = Action { implicit request =>
     val answers = request.queryString.getOrElse("answer", List()) map (_.toInt)
     if (answers.isEmpty)
-      Ok(views.html.question(quizTitle, questions, qid))
+      Ok(views.html.question(title, questions, qid))
     else {
       val correct = questions(qid).suggestions filter(_.answer) map(_.id) equals(answers)
-      Ok(views.html.answer(quizTitle, questions, qid, answers, correct))      
+      Ok(views.html.answer(title, questions, qid, answers, correct))      
     }
   }
 
   def questionAnswer(qid: Int, aid: Int) = Action {
-    Ok(views.html.index(quizTitle, questions))
+    Ok(views.html.index(title, titlePage, questions))
   }
 
   def presentation = Action {
     val random = scala.util.Random.shuffle(questions.toList)
-    Ok(views.html.presentation(quizTitle, questions))
+    Ok(views.html.presentation(title, titlePage, questions))
   }
 
   import Play.current
@@ -56,7 +56,8 @@ object Application extends Controller {
     text <- scala.util.Try(scala.io.Source.fromInputStream(is).mkString("")).toOption
   } yield text
 
-  val quizTitle = QUIZ_DESCRIPTION_REGEX findFirstIn (source.getOrElse("")) map (_.substring(2)) getOrElse ("Quiz")
+  val titlePage = QUIZ_DESCRIPTION_REGEX findFirstIn (source.getOrElse("")) map (toHtml(_)) getOrElse ("Quiz")
+  val title = titlePage.replaceAll("</?[^>]*>", "")
 
   val questions = source.getOrElse("").split("\n##") drop(1) map { split =>
     val questionSource = if (split.startsWith("##")) split else s"##$split"

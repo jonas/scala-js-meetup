@@ -1,4 +1,4 @@
-@(title: String, questions: Seq[Question])
+@(title: String, titlePage: String, questions: Seq[Question])
 
 <!doctype html>
 <html lang="en">
@@ -14,6 +14,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link rel="icon" type="image/png" href="@routes.Assets.at("/images/scala-js-logo-32.png")">
 
 	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/reveal.min.css")">
 	<link rel="stylesheet" href="@routes.Assets.at("reveal.js/css/theme/default.css")" id="theme">
@@ -35,6 +36,7 @@
 		.reveal pre { width: auto; }
 		.reveal pre code {
 			overflow: initial;
+			max-height: none;
 		}
 		.reveal h2 code {
 			font-size: 0.8em;
@@ -45,18 +47,25 @@
 		.reveal .slides .explaination-slide .false-suggestion {
 			opacity: 0.2;
 		}
+		.reveal .slides img {
+			border: none;
+			background: inherit;
+			box-shadow: inherit;
+		}
 	</style>
 </head>
 <body class="reveal">
 <div class="slides">
 
 <section>
-	<h1>@title</h1>
+	@Html(titlePage)
 </section>
 
 @for(question <- questions) {
 	<section>
-		<section>
+		@if(question.suggestions.size > 0) {
+			<section>
+		}
 			@Html(question.text)
 			<ol>
 				@for(suggestion <- question.suggestions) {
@@ -66,8 +75,8 @@
 				}
 			</ol>
 
-		</section>
 		@if(question.suggestions.size > 0) {
+			</section>
 			<section class="explaination-slide">
 				@Html(question.text)
 				@question.explaination.map { explaination =>

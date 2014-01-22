@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String, titlePage: String = "")(content: Html)
 
 <!DOCTYPE html>
 
@@ -12,9 +12,13 @@
 	</head>
 	<body>
 		<div class="container">
-			<div class="page-header">
-				<h1>@title</h1>
-			</div>
+			@if(titlePage.isEmpty) {
+				<div class="page-header">
+					<h1>@title</h1>
+				</div>
+			} else {
+				@Html(titlePage)
+			}
 		</div>
 		<div class="container">
 			@content
